@@ -16,6 +16,7 @@ import {
 } from './client';
 import { MessageType } from './protocol';
 import { WebSerialTransport } from './serial';
+import { HackyLensDocs } from './HackyLensDocs';
 import { MonacoEditor } from './MonacoEditor';
 import './app.scss';
 
@@ -81,6 +82,7 @@ export const HackyLensApp: React.FC = () => {
     const [logs, setLogs] = useState('HackyLens Code готов к подключению.\n');
     const [busy, setBusy] = useState('');
     const [error, setError] = useState('');
+    const [docsOpen, setDocsOpen] = useState(false);
 
     const sourceBytes = useMemo(() => new TextEncoder().encode(source).length, [source]);
     const dirty = source !== savedSource;
@@ -394,15 +396,23 @@ export const HackyLensApp: React.FC = () => {
                     </div>
                 </div>
                 <div className="connection-cluster">
+                    <button
+                        className={`button docs-toggle ${docsOpen ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => setDocsOpen((open) => !open)}
+                        aria-expanded={docsOpen}
+                    >
+                        ▤ Документация
+                    </button>
                     <span className={`connection-dot ${connected ? 'online' : ''}`} />
-                    <span>{connected ? `${hello?.board ?? 'HackyLens'} · ${hello?.firmwareVersion ?? ''}` : 'не подключено'}</span>
+                    <span className="connection-status">{connected ? `${hello?.board ?? 'HackyLens'} · ${hello?.firmwareVersion ?? ''}` : 'не подключено'}</span>
                     <button className={connected ? 'button ghost' : 'button primary'} onClick={connected ? disconnect : connect} disabled={Boolean(busy)}>
                         {connected ? 'Отключить' : 'Подключить USB'}
                     </button>
                 </div>
             </header>
 
-            <section className="ide-layout">
+            <section className={`ide-layout ${docsOpen ? 'docs-open' : ''}`}>
                 <aside className="sidebar panel">
                     <div className="panel-heading">
                         <div>
@@ -450,7 +460,7 @@ export const HackyLensApp: React.FC = () => {
                     <MonacoEditor value={source} onChange={setSource} readOnly={Boolean(busy)} />
                 </section>
 
-                <aside className="right-column">
+                {!docsOpen && <aside className="right-column">
                     <section className="runtime-card panel">
                         <div className="panel-heading compact">
                             <div><span className="eyebrow">CORE 1</span><h2>Runtime</h2></div>
@@ -468,13 +478,9 @@ export const HackyLensApp: React.FC = () => {
                             <button className="button danger-text" onClick={removeFile} disabled={!selected || Boolean(busy)}>Удалить файл</button>
                         </div>
                     </section>
-                    <section className="help-card panel">
-                        <span className="eyebrow">API V1</span>
-                        <h2>Быстрый старт</h2>
-                        <code>import hackylens as hl</code>
-                        <p>Дисплей, кнопки, LED, UART и I²C — модуль <strong>hackylens</strong>. BACK или «Стоп» безопасно прерывают скрипт.</p>
-                    </section>
-                </aside>
+                </aside>}
+
+                {docsOpen && <HackyLensDocs onClose={() => setDocsOpen(false)} />}
 
                 <section className="console panel">
                     <div className="console-heading">
