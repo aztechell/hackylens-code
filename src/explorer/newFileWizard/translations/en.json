@@ -1,0 +1,16 @@
+{
+    "title": "Create a new file",
+    "template": {
+        "label": "Template"
+    },
+    "useTemplate": {
+        "label": "Use a template",
+        "description": {
+            "checked": "Create a new file for the selected hub.",
+            "unchecked": "Create a new empty file."
+        }
+    },
+    "action": {
+        "create": "Create"
+    }
+}

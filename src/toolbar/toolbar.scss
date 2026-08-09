@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2020-2022 The Pybricks Authors
+
+// Custom styling for the Toolbar control.
+
+@use '@blueprintjs/core/lib/scss/variables' as bp;
+@use '../variables' as pb;
+
+.pb-toolbar {
+    padding: bp.$pt-grid-size bp.$pt-grid-size * 1.5;
+    z-index: bp.$pt-z-index-content;
+    display: flex;
+    flex-wrap: nowrap;
+
+    // make small buttons more square and slightly smaller (some of this is
+    // done in react)
+    @media screen and (max-width: pb.$narrow-screen-limit) {
+        .#{bp.$ns}-button {
+            padding: 5px;
+        }
+    }
+
+    // override blueprint.js style
+    & * {
+        box-shadow: unset !important;
+    }
+
+    &-group {
+        &.pb-align-left {
+            margin-right: bp.$pt-grid-size * 2;
+        }
+
+        &.pb-align-right {
+            margin-left: auto;
+        }
+    }
+
+    &-action-button:focus-visible:not(.pb-focus-managed) {
+        // to get contrast since button background and focus ring are both blue
+        outline-offset: 4px;
+    }
+}

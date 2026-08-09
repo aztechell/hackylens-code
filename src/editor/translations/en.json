@@ -1,0 +1,15 @@
+{
+    "tablist": {
+        "label": "Editor"
+    },
+    "welcome": "Welcome",
+    "placeholder": "Write your program here...",
+    "check": "Check syntax",
+    "copy": "Copy",
+    "paste": "Paste",
+    "selectAll": "Select all",
+    "undo": "Undo",
+    "redo": "Redo",
+    "closeFile": { "tooltip": "Close {fileName}" },
+    "contextMenu": { "label": "Editor context menu" }
+}

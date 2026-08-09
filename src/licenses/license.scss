@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2020-2022 The Pybricks Authors
+
+// Custom styling for the LicenseDialog control.
+
+@use '@blueprintjs/core/lib/scss/variables' as bp;
+
+.pb-license-dialog {
+    width: 1200px;
+}
+
+.pb-license-browser {
+    margin-top: 16px;
+    display: flex;
+    gap: 2px;
+    height: 600px;
+}
+
+@media only screen and (max-height: 800px) {
+    .pb-license-browser {
+        height: 400px;
+    }
+}
+
+.pb-license-list {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+
+    & > .#{bp.$ns}-tree {
+        flex-grow: 1;
+        min-height: 0;
+
+        display: flex;
+
+        & > .#{bp.$ns}-tree-root {
+            flex-grow: 1;
+            min-height: 0;
+            // to allow for focus outline
+            padding: 2px;
+            overflow: auto;
+
+            & .#{bp.$ns}-tree-node-content {
+                padding-left: bp.$pt-grid-size * 0.5;
+            }
+        }
+    }
+}
+
+.pb-license-info {
+    width: 80%;
+    padding: 0px 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: bp.$pt-grid-size;
+}
+
+.pb-license-text {
+    overflow: auto;
+    min-height: 0;
+
+    & pre {
+        white-space: pre-wrap;
+        word-break: keep-all;
+        margin: 0;
+    }
+}

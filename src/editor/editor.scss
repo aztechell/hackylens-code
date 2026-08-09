@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2020-2023 The Pybricks Authors
+
+// Custom styling for the Editor control.
+
+@use '@blueprintjs/core/lib/scss/variables' as bp;
+@use '../variables.scss' as pb;
+
+// add "BETA" watermark
+
+.pb-beta .editor-scrollable::after {
+    content: '';
+    background: url('./beta.svg');
+    opacity: 1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.pb-editor {
+    display: flex;
+    flex-direction: column;
+
+    &-tablist {
+        flex: none;
+        padding: bp.$pt-grid-size * 0.3;
+        overflow-x: auto;
+        @include pb.background-contrast(6%);
+
+        .#{bp.$ns}-tab-list > * {
+            padding-left: bp.$pt-grid-size * 1.5;
+
+            &:not(:last-child) {
+                margin: unset;
+            }
+        }
+
+        &-tab {
+            padding-right: bp.$pt-grid-size * 0.5;
+            border-right: 1px solid bp.$pt-divider-black;
+            max-width: bp.$pt-grid-size * 15;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+
+            .#{bp.$ns}-dark & {
+                border-right-color: bp.$pt-dark-divider-white;
+            }
+
+            & .#{bp.$ns}-text-overflow-ellipsis {
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+        }
+    }
+
+    &-tabpanel {
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+
+    &-welcome {
+        display: none;
+
+        .pb-editor-tabpanel.pb-empty > & {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &-monaco {
+        width: 100%;
+        height: 100%;
+
+        .pb-editor-tabpanel.pb-empty > & {
+            display: none;
+        }
+    }
+
+    &-placeholder {
+        pointer-events: none;
+        width: max-content;
+        color: bp.$pt-text-color-muted;
+        font-style: italic;
+        padding-left: 4px;
+
+        .#{bp.$ns}-dark & {
+            color: bp.$pt-dark-text-color-muted;
+        }
+    }
+}
+
+.monaco-editor {
+    // override iOS keyboard button position
+    & .iPadShowKeyboard {
+        right: unset !important;
+        left: 20px;
+    }
+
+    // fix find widget in front of dialogs
+    & .overflow-guard {
+        z-index: bp.$pt-z-index-content - 1;
+    }
+
+    // allow overflow to overlay content outside of editor
+    & .overflowingContentWidget {
+        z-index: bp.$pt-z-index-overlay - 1;
+    }
+}

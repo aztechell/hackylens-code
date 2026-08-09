@@ -1,0 +1,12 @@
+{
+    "description": "HackyLens MicroPython IDE derived from Pybricks Code",
+    "private": true,
+    "homepage": ".",
+    "scripts": {
+        "start": "node scripts/hackylens-start.js",
+        "build": "node scripts/hackylens-build.js",
+        "test": "jest --config config/jest.hackylens.js --runInBand",
+        "typecheck": "tsc --noEmit",
+        "lint": "tsc --noEmit"
+    }
+}

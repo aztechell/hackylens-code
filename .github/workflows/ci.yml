@@ -1,0 +1,42 @@
+name: HackyLens Code CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install pinned dependencies
+        run: node .yarn/releases/yarn-3.3.0.cjs install --immutable
+
+      - name: Typecheck
+        run: node .yarn/releases/yarn-3.3.0.cjs typecheck
+
+      - name: Test
+        run: node .yarn/releases/yarn-3.3.0.cjs test
+
+      - name: Build production site
+        run: node .yarn/releases/yarn-3.3.0.cjs build
+
+      - name: Upload production site
+        uses: actions/upload-artifact@v4
+        with:
+          name: hackylens-code-${{ github.sha }}
+          path: build/
+          if-no-files-found: error

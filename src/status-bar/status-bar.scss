@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2020-2023 The Pybricks Authors
+
+// Custom styling for the StatusBar control.
+
+@use '@blueprintjs/core/lib/scss/variables' as bp;
+@use '../variables' as pb;
+
+.pb-status-bar {
+    background-color: pb.$pybricks-blue;
+    min-height: pb.$status-bar-height;
+    max-height: pb.$status-bar-height;
+    width: 100vw;
+    padding-inline: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &-group {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.pb-battery-indicator {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px;
+}
+
+.pb-battery-indicator-body {
+    border-radius: 3px;
+    border: 2px solid bp.$pt-text-color;
+    background-color: bp.$pt-text-color;
+    width: 30px;
+}
+
+.pb-battery-indicator-body .#{bp.$ns}-progress-bar {
+    height: 12px;
+}
+
+.pb-battery-indicator-body .#{bp.$ns}-progress-bar,
+.pb-battery-indicator-body .#{bp.$ns}-progress-meter {
+    border-radius: 3px;
+}
+
+.pb-battery-indicator-tip {
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+    border: 1px solid bp.$pt-text-color;
+    background-color: bp.$pt-text-color;
+    width: 3px;
+    height: 8px;
+}
+
+.#{bp.$ns}-dark .pb-battery-indicator-body,
+.#{bp.$ns}-dark .pb-battery-indicator-tip {
+    border-color: bp.$pt-dark-text-color;
+    background-color: bp.$pt-dark-text-color;
+}

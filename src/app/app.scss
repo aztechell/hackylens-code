@@ -1,0 +1,205 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2020-2026 The Pybricks Authors
+
+// Custom styling for the App control.
+
+@use 'sass:color';
+@use 'sass:map';
+
+@use '@blueprintjs/core/lib/scss/variables' as bp;
+@use '@blueprintjs/icons/lib/scss/variables' as bpi;
+@use '../variables' as pb;
+
+@import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+
+.pb-app {
+    width: 100%;
+    height: 100%;
+    background-color: bp.$pt-app-background-color;
+    display: flex;
+    flex-direction: column;
+
+    .#{bp.$ns}-dark & {
+        background-color: bp.$pt-dark-app-background-color;
+    }
+
+    &-activities {
+        display: flex;
+    }
+
+    &-terminal {
+        height: 100%;
+        padding-top: 8px;
+        padding-left: 8px;
+        background-color: white;
+
+        .#{bp.$ns}-dark & {
+            background-color: black;
+        }
+    }
+
+    &-docs {
+        height: 100%;
+
+        &-drag-helper {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+    }
+
+    & iframe {
+        border: none;
+    }
+}
+
+.pb-app-body {
+    min-height: 0;
+    flex: 1 1 auto;
+
+    display: flex;
+    flex-direction: row;
+
+    .pb-app-main {
+        min-width: 0;
+        flex: 1 1 auto;
+        @include pb.background-contrast(4%);
+    }
+}
+
+.pb-app-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    & .pb-editor {
+        min-height: 0;
+        flex: 1 1 auto;
+    }
+}
+
+.pb-app-doc-button {
+    position: absolute;
+    bottom: bp.$pt-grid-size;
+    right: bp.$pt-grid-size;
+    z-index: bp.$pt-z-index-overlay;
+}
+
+$splitter-background-color: bp.$light-gray2;
+$splitter-background-color-hover: bp.$gray4;
+$dark-splitter-background-color: bp.$dark-gray5;
+$dark-splitter-background-color-hover: bp.$gray2;
+
+$splitter-constrast: -15%;
+$dark-splitter-constrast: 20%;
+
+$splitter-color: color.adjust(
+    $splitter-background-color,
+    $lightness: $splitter-constrast
+);
+$splitter-color-hover: color.adjust(
+    $splitter-background-color-hover,
+    $lightness: $splitter-constrast
+);
+$dark-splitter-color: color.adjust(
+    $dark-splitter-background-color,
+    $lightness: $dark-splitter-constrast
+);
+$dark-splitter-color-hover: color.adjust(
+    $dark-splitter-background-color-hover,
+    $lightness: $dark-splitter-constrast
+);
+
+.layout-splitter:before {
+    $width: 1.5;
+    $height: 2.7;
+    $radius: 0.4;
+
+    content: map.get(bpi.$blueprint-icon-codepoints, 'drag-handle-vertical') / '';
+    height: bp.$pt-grid-size * $height;
+    width: bp.$pt-grid-size * $width;
+    top: calc(50% - bp.$pt-grid-size * $height * 0.5);
+    left: bp.$pt-grid-size * $width * -0.5 + 2px;
+
+    .splitter-layout-vertical & {
+        $width: 2.7;
+        $height: 1.4;
+
+        content: map.get(bpi.$blueprint-icon-codepoints, 'drag-handle-horizontal') / '';
+        height: bp.$pt-grid-size * $height;
+        width: bp.$pt-grid-size * $width;
+        top: bp.$pt-grid-size * $height * -0.5 + 2px;
+        left: calc(50% - bp.$pt-grid-size * $width * 0.5);
+    }
+
+    font-family: bpi.$blueprint-icons-16-font;
+    font-size: large;
+    display: flex;
+    position: relative;
+    border-radius: bp.$pt-grid-size * $radius;
+    padding: bp.$pt-grid-size * 0.5;
+    align-items: center;
+    justify-content: center;
+    z-index: bp.$pt-z-index-content;
+
+    color: $splitter-color;
+    background-color: $splitter-background-color;
+
+    .#{bp.$ns}-dark & {
+        color: $dark-splitter-color;
+        background-color: $dark-splitter-background-color;
+    }
+}
+
+// make layout splitter match app color scheme
+.splitter-layout > .layout-splitter {
+    color: $splitter-color;
+    background-color: $splitter-background-color;
+
+    &:hover,
+    &:hover:before {
+        color: $splitter-color-hover;
+        background-color: $splitter-background-color-hover;
+    }
+
+    .#{bp.$ns}-dark & {
+        color: $dark-splitter-color;
+        background-color: $dark-splitter-background-color;
+
+        &:hover,
+        &:hover:before {
+            color: $dark-splitter-color-hover;
+            background-color: $dark-splitter-background-color-hover;
+        }
+    }
+}
+
+// we want overflow visible for editor overlays but it breaks resizing
+// so we can only apply this when not resizing
+.splitter-layout:not(.layout-changing) > .layout-pane:has(.pb-app-editor) {
+    overflow: visible;
+}
+
+.splitter-layout .layout-pane {
+    // fix double scroll bars in terminal when resizing
+    overflow: hidden;
+
+    &.layout-pane-primary {
+        // fix resizing window vertically
+        min-height: 0;
+    }
+}
+
+// hide the docs and resize separator
+// Use visibility rather than display:none so the iframe keeps its layout and
+// scroll position when the docs panel is toggled.
+// Collapse the secondary pane and splitter to zero width so they don't
+// consume space, while keeping the iframe in the DOM.
+div.pb-hide-docs > :not(.layout-pane-primary) {
+    visibility: hidden;
+    pointer-events: none;
+    flex-basis: 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+}

@@ -1,0 +1,41 @@
+{
+    "noWebBluetooth": {
+        "message": "This browser does not support Web Bluetooth or it is not enabled.",
+        "suggestion": "Use a supported browser such as Google Chrome or Microsoft Edge.",
+        "linux": "Web Bluetooth is experimental on Linux and must be manually enabled. Copy the link below and paste it in the address bar.",
+        "action": "More Info"
+    },
+    "bluetoothNotAvailable": {
+        "message": "No Bluetooth adapter could be found or permission to use it has not been granted.",
+        "suggestion": "Please connect or enable a Bluetooth Low Energy adapter, ensure your browser has permission to use it and restart the browser.",
+        "browserSupport": "Some browsers like Brave and Opera do not support Web Bluetooth. Be sure to use a supported browser such as Chrome, Edge or on iOS WebBLE."
+    },
+    "noGatt": {
+        "message": "The web browser did not give permission to use Bluetooth Low Energy."
+    },
+    "missingService": {
+        "message": "Connected to hub but failed to get {serviceName} service.",
+        "suggestion1": "Ensure that you are using the most recent firmware.",
+        "suggestion2": "If the problem persists, try removing the \"{hubName}\" device in your OS Bluetooth settings, then try connecting again."
+    },
+    "noHub": {
+        "message": "No hub detected.",
+        "suggestion": "Have you installed the Pybricks firmware yet?",
+        "flashFirmwareButton": "Install Pybricks firmware",
+        "troubleshootButton": "Solve connectivity issues"
+    },
+    "oldFirmware": {
+        "message": "A new firmware version is available for this hub. Please install the latest version to use all new features.",
+        "flashFirmware": {
+            "label": "Update Pybricks firmware"
+        }
+    },
+    "newPybricksProfile": {
+        "message": "The connected hub uses a newer Pybricks communication profile version. Some features may not work correctly.",
+        "versions": "The hub has {hubVersion} while {app} supports {appVersion}.",
+        "suggestion": "Downgrade the hub firmware or upgrade {app} to avoid problems."
+    },
+    "disconnected": {
+        "message": "The hub is no longer connected. Please reconnect and try again."
+    }
+}

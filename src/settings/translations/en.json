@@ -1,0 +1,56 @@
+{
+    "title": "Settings & Help",
+    "appearance": {
+        "title": "Appearance",
+        "darkMode": {
+            "label": "Dark Mode",
+            "help": "Enable to choose dark mode. Disable to choose light mode."
+        },
+        "zoom": {
+            "help": "Use {in} and {out} to zoom."
+        }
+    },
+    "firmware": {
+        "title": "Firmware",
+        "flashPybricksButton": {
+            "label": "Install Pybricks Firmware"
+        },
+        "flashLegoButton": {
+            "label": "Restore Official {lego} Firmware"
+        }
+    },
+    "help": {
+        "title": "Help",
+        "projects": {
+            "label": "Example Projects"
+        },
+        "support": {
+            "label": "Support"
+        },
+        "chat": {
+            "label": "Chat"
+        },
+        "bugs": {
+            "label": "Bug Reports"
+        }
+    },
+    "app": {
+        "title": "App",
+        "offlineUseHelp": "Ready for offline use.",
+        "install": {
+            "label": "Install as App"
+        },
+        "checkForUpdate": {
+            "label": "Check for Update"
+        },
+        "restart": {
+            "label": "Restart to Install Update"
+        },
+        "about": {
+            "label": "About"
+        },
+        "tour": {
+            "label": "Welcome Tour"
+        }
+    }
+}

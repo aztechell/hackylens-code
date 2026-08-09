@@ -1,0 +1,61 @@
+{
+    "title": "Windows DFU USB driver installation instructions",
+    "backButton": {
+        "label": "Back"
+    },
+    "nextButton": {
+        "label": "Next"
+    },
+    "doneButton": {
+        "label": "Done"
+    },
+    "step": {
+        "1": {
+            "message": "Right-click the Windows {startMenu}, then click {deviceManager}.",
+            "startMenu": "Start Menu",
+            "deviceManager": "Device Manager"
+        },
+        "2": {
+            "message": "Look for {dfuUsbHubName} under {otherDevices}.",
+            "otherDevices": "Other Devices",
+            "properties": "Properties",
+            "listedWithWarning": "If it is listed with a warning sign, right-click it and select {properties}.",
+            "listedWithoutWarning": "If it is listed somewhere else without a warning sign, then the driver is already installed. You may close this window.",
+            "notListed": "If you don't see it at all, make sure that the hub is in DFU update mode and try again. Close this window to watch the video instructions."
+        },
+        "3": {
+            "message": "In the {properties} dialog, click the {updateDriver} button.",
+            "properties": "{dfuUsbHubName} Properties",
+            "updateDriver": "Update Driver..."
+        },
+        "4": {
+            "message": "In the {updateDrivers} dialog, click the {browse} button.",
+            "updateDrivers": "Update Drivers",
+            "browse": "Browse my computer for drivers"
+        },
+        "5": {
+            "message": "Then click the {letMePick} button.",
+            "letMePick": "Let me pick from a list of available drivers on my computer"
+        },
+        "6": {
+            "message": "In the list of device types, select {usbDevices}, then click the {next} button.",
+            "usbDevices": "Universal Serial Bus devices",
+            "next": "Next"
+        },
+        "7": {
+            "message": "In the {manufacturer} list, select {winUsbDevice}. Then in the {model} list, also select {winUsbDevice}. Then click the {next} button.",
+            "manufacturer": "Manufacturer",
+            "winUsbDevice": "WinUsb Device",
+            "model": "Model",
+            "next": "Next"
+        },
+        "8": {
+            "message": "A warning dialog says that the driver is not recommended. Click {yes} to proceed anyway. The driver is compatible.",
+            "yes": "Yes"
+        },
+        "9": {
+            "message": "The driver installation is complete. Click the {close} button.",
+            "close": "Close"
+        }
+    }
+}

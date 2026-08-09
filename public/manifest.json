@@ -1,0 +1,9 @@
+{
+    "short_name": "HackyLens",
+    "name": "HackyLens Code",
+    "description": "MicroPython IDE for HackyLens",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#070b11",
+    "background_color": "#070b11"
+}

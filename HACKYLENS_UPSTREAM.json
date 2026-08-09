@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/pybricks/pybricks-code",
+  "revision": "ea9af98d1fd0a842ed76d3a7f83767f363bc1b17",
+  "profile": "hackylens-source",
+  "verified_blobs": 481,
+  "verified_bytes": 4762761,
+  "omitted": [
+    "src/firmware/assets/*.bin",
+    "src/firmware/bootloaderInstructions/assets/*.mp4"
+  ]
+}

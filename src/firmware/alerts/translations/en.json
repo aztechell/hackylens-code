@@ -1,0 +1,38 @@
+{
+    "dfuError": {
+        "message": "A USB error ocurred while installing the firmware.",
+        "suggestion": "Ensure the USB cable is not damaged and is firmly attached to the hub and to the computer.",
+        "tryAgainButton": "Try again"
+    },
+    "noWebUsb": {
+        "message": "This browser does not support WebUSB or WebUSB is not enabled.",
+        "suggestion": "Use a supported browser such as Google Chrome or Microsoft Edge."
+    },
+    "noWebHid": {
+        "message": "This browser does not support WebHID or WebHID is not enabled.",
+        "suggestion": "Use a supported browser such as Google Chrome or Microsoft Edge."
+    },
+    "noDfuHub": {
+        "message": "Could not find your hub?",
+        "suggestion1": {
+            "windows": "You may need to manually install a USB driver before you can connect to your hub.",
+            "linux": "You may need to add udev rules before you can connect to your hub."
+        },
+        "troubleshootButton": "Troubleshooting Tips",
+        "installUsbDriverButton": "Install USB Driver",
+        "configureUdevRulesButton": "Configure udev rules"
+    },
+    "unsupportedDfuHub": {
+        "message": "This hub has different internal electronics and requires a different firmware. Pybricks does not support this yet. We are working on it!"
+    },
+    "noDfuInterface": {
+        "message": "This is very unusual. The USB device did not contain the expected interface."
+    },
+    "flashProgress": {
+        "erasing": "Erasing the old firmware: {percent}",
+        "flashing": "Installing the new firmware: {percent}"
+    },
+    "releaseButton": {
+        "message": "You may release the power button on the hub now."
+    }
+}

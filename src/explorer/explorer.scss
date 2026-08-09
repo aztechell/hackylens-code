@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2022 The Pybricks Authors
+
+@use '@blueprintjs/core/lib/scss/variables' as bp;
+
+.pb-explorer {
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    &-header-toolbar {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    &-file-tree {
+        flex: 1 auto;
+        overflow-y: auto;
+
+        & .#{bp.$ns}-tree-node-list {
+            // make foucus outline fit
+            margin: 2px;
+        }
+
+        // don't need extra padding around toolbar
+        & .#{bp.$ns}-tree-node-secondary-label {
+            padding: unset;
+        }
+
+        // fix layout since we are nesting toolbar in button group
+        &-action-toolbar {
+            display: inline-flex;
+        }
+    }
+}
