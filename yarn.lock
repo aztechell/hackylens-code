@@ -671,6 +671,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/plugin-proposal-private-property-in-object@npm:^7.16.7":
+  version: 7.21.11
+  resolution: "@babel/plugin-proposal-private-property-in-object@npm:7.21.11"
+  dependencies:
+    "@babel/helper-annotate-as-pure": ^7.18.6
+    "@babel/helper-create-class-features-plugin": ^7.21.0
+    "@babel/helper-plugin-utils": ^7.20.2
+    "@babel/plugin-syntax-private-property-in-object": ^7.14.5
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+  checksum: 1b880543bc5f525b360b53d97dd30807302bb82615cd42bf931968f59003cac75629563d6b104868db50abd22235b3271fdf679fea5db59a267181a99cc0c265
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-proposal-unicode-property-regex@npm:^7.18.6, @babel/plugin-proposal-unicode-property-regex@npm:^7.4.4":
   version: 7.18.6
   resolution: "@babel/plugin-proposal-unicode-property-regex@npm:7.18.6"
@@ -6696,6 +6710,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-preset-react-app@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "babel-preset-react-app@npm:10.1.0"
+  dependencies:
+    "@babel/core": ^7.16.0
+    "@babel/plugin-proposal-class-properties": ^7.16.0
+    "@babel/plugin-proposal-decorators": ^7.16.4
+    "@babel/plugin-proposal-nullish-coalescing-operator": ^7.16.0
+    "@babel/plugin-proposal-numeric-separator": ^7.16.0
+    "@babel/plugin-proposal-optional-chaining": ^7.16.0
+    "@babel/plugin-proposal-private-methods": ^7.16.0
+    "@babel/plugin-proposal-private-property-in-object": ^7.16.7
+    "@babel/plugin-transform-flow-strip-types": ^7.16.0
+    "@babel/plugin-transform-react-display-name": ^7.16.0
+    "@babel/plugin-transform-runtime": ^7.16.4
+    "@babel/preset-env": ^7.16.4
+    "@babel/preset-react": ^7.16.0
+    "@babel/preset-typescript": ^7.16.0
+    "@babel/runtime": ^7.16.3
+    babel-plugin-macros: ^3.1.0
+    babel-plugin-transform-react-remove-prop-types: ^0.4.24
+  checksum: e4ac6c85be4f56c7e45b52700e04aed01422221b5c988e7a192a80d3b5aa3abbd415c0b76e8b5d564a411477a0b03323a15108663a9f541bd9397fa32f28ed89
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -10114,7 +10153,7 @@ __metadata:
     babel-plugin-macros: ^3.0.1
     babel-plugin-named-asset-import: ^0.3.8
     babel-plugin-transform-import-meta: ^2.2.1
-    babel-preset-react-app: ^10.0.1
+    babel-preset-react-app: ^10.1.0
     bfj: ^8.0.0
     browser-fs-access: ^0.35.0
     browserslist: ^4.22.2
