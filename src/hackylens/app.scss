@@ -70,7 +70,7 @@ input:focus-visible {
     isolation: isolate;
     height: 100%;
     display: grid;
-    grid-template-rows: 54px minmax(0, 1fr) 204px;
+    grid-template-rows: 54px minmax(0, 1fr);
     background:
         radial-gradient(circle at 74% -25%, rgba(65, 118, 82, 0.12), transparent 34%),
         transparent;
@@ -258,14 +258,15 @@ input:focus-visible {
     opacity: 0.35;
 }
 
-.workspace {
+.ide-layout {
     position: relative;
     z-index: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: 216px minmax(450px, 1fr) 230px;
+    grid-template-columns: 184px minmax(450px, 1fr) 230px;
+    grid-template-rows: minmax(0, 1fr) 204px;
     gap: 8px;
-    padding: 18px clamp(12px, 2.5vw, 28px) 8px;
+    padding: 18px clamp(12px, 2.5vw, 28px) 16px;
 }
 
 .sidebar,
@@ -287,6 +288,8 @@ input:focus-visible {
     min-height: 0;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-column: 1;
+    grid-row: 1 / -1;
 }
 
 .panel-heading,
@@ -298,7 +301,12 @@ input:focus-visible {
 }
 
 .panel-heading {
+    gap: 10px;
     padding: 14px 14px 10px;
+}
+
+.panel-heading > div {
+    min-width: 0;
 }
 
 .panel-heading.compact {
@@ -326,6 +334,7 @@ input:focus-visible {
     height: 29px;
     display: grid;
     place-items: center;
+    flex: 0 0 auto;
     border: 1px solid var(--green-dim);
     border-radius: 4px;
     background: #0e1812;
@@ -349,6 +358,18 @@ input:focus-visible {
     margin-bottom: 7px;
     color: var(--muted);
     font: 10px var(--mono);
+}
+
+.storage-meter > div span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.storage-meter > div span:last-child {
+    font-size: 9px;
+    text-align: right;
 }
 
 .storage-meter progress {
@@ -460,10 +481,14 @@ input:focus-visible {
 }
 
 .sidebar-actions {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 6px;
     padding: 8px;
+}
+
+.sidebar-actions .button {
+    width: 100%;
 }
 
 .editor-panel {
@@ -471,6 +496,8 @@ input:focus-visible {
     min-height: 0;
     display: grid;
     grid-template-rows: 53px minmax(0, 1fr);
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .editor-toolbar {
@@ -551,6 +578,8 @@ input:focus-visible {
     gap: 8px;
     overflow-y: auto;
     padding-right: 2px;
+    grid-column: 3;
+    grid-row: 1;
 }
 
 .runtime-card {
@@ -648,9 +677,11 @@ input:focus-visible {
     position: relative;
     z-index: 1;
     min-height: 0;
-    margin: 0 clamp(12px, 2.5vw, 28px) 16px;
+    margin: 0;
     display: grid;
     grid-template-rows: 43px minmax(0, 1fr);
+    grid-column: 2 / -1;
+    grid-row: 2;
 }
 
 .console-heading {
@@ -720,8 +751,8 @@ input:focus-visible {
 }
 
 @media (max-width: 1180px) {
-    .workspace {
-        grid-template-columns: 190px minmax(430px, 1fr) 205px;
+    .ide-layout {
+        grid-template-columns: 168px minmax(430px, 1fr) 205px;
     }
 
     .source-meta {

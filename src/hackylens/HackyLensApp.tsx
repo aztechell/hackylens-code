@@ -326,11 +326,19 @@ export const HackyLensApp: React.FC = () => {
     }), [appendLog, refreshFiles, runBusy]);
 
     const newFile = useCallback(() => {
-        setFileName(DEFAULT_NAME);
+        const existingNames = new Set(files.map((file) => file.name));
+        existingNames.add(fileName);
+        let nextName = 'untitled.py';
+        let suffix = 2;
+        while (existingNames.has(nextName)) {
+            nextName = `untitled-${suffix}.py`;
+            suffix += 1;
+        }
+        setFileName(nextName);
         setSource(DEFAULT_SOURCE);
         setSavedSource('');
         setError('');
-    }, []);
+    }, [fileName, files]);
 
     useEffect(() => {
         if (!connected || busy) {
@@ -394,7 +402,7 @@ export const HackyLensApp: React.FC = () => {
                 </div>
             </header>
 
-            <section className="workspace">
+            <section className="ide-layout">
                 <aside className="sidebar panel">
                     <div className="panel-heading">
                         <div>
@@ -467,18 +475,18 @@ export const HackyLensApp: React.FC = () => {
                         <p>Дисплей, кнопки, LED, UART и I²C — модуль <strong>hackylens</strong>. BACK или «Стоп» безопасно прерывают скрипт.</p>
                     </section>
                 </aside>
-            </section>
 
-            <section className="console panel">
-                <div className="console-heading">
-                    <div><span className="eyebrow">HMPY EVENTS</span><h2>Вывод</h2></div>
-                    <div className="console-actions">
-                        {busy && <span className="busy-label">{busy}</span>}
-                        {error && <span className="error-label" title={error}>Ошибка: {error}</span>}
-                        <button className="button ghost small" onClick={() => setLogs('')}>Очистить</button>
+                <section className="console panel">
+                    <div className="console-heading">
+                        <div><span className="eyebrow">HMPY EVENTS</span><h2>Вывод</h2></div>
+                        <div className="console-actions">
+                            {busy && <span className="busy-label">{busy}</span>}
+                            {error && <span className="error-label" title={error}>Ошибка: {error}</span>}
+                            <button className="button ghost small" onClick={() => setLogs('')}>Очистить</button>
+                        </div>
                     </div>
-                </div>
-                <pre ref={logRef}>{logs || ' '}</pre>
+                    <pre ref={logRef}>{logs || ' '}</pre>
+                </section>
             </section>
         </main>
     );
