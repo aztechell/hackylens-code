@@ -5211,12 +5211,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-transition-group@npm:^4.4.10":
-  version: 4.4.10
-  resolution: "@types/react-transition-group@npm:4.4.10"
-  dependencies:
+"@types/react-transition-group@npm:^4.4.12":
+  version: 4.4.12
+  resolution: "@types/react-transition-group@npm:4.4.12"
+  peerDependencies:
     "@types/react": "*"
-  checksum: fe2ea11f70251e9f79f368e198c18fd469b1d4f1e1d44e4365845b44e15974b0ec925100036f449b023b0ca3480a82725c5f0a73040e282ad32ec7b0def9b57c
+  checksum: 13d36396cae4d3c316b03d4a0ba299f0d039c59368ba65e04b0c3dc06fd0a16f59d2c669c3e32d6d525a95423f156b84e550d26bff0bdd8df285f305f8f3a0ed
   languageName: node
   linkType: hard
 
@@ -10098,7 +10098,7 @@ __metadata:
     "@types/react": ^18.2.47
     "@types/react-dom": ^18.2.18
     "@types/react-splitter-layout": ^3.0.5
-    "@types/react-transition-group": ^4.4.10
+    "@types/react-transition-group": ^4.4.12
     "@types/redux-logger": ^3.0.12
     "@types/semver": ^7.5.6
     "@types/w3c-web-hid": ^1.0.6
