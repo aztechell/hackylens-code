@@ -24,7 +24,7 @@ export const sections: readonly DocSection[] = [
         label: 'Начало работы',
         kicker: 'HackyLens MicroPython',
         title: 'Справочник API v1',
-        lead: 'Модуль hackylens связывает MicroPython-скрипт с кнопками, дисплеем, подсветкой и внешним разъёмом устройства.',
+        lead: 'IDE подключается к HUSKYLENS SEN0305 и Sipeed Maix Cube с прошивкой HackyLens. Модуль hackylens даёт скрипту доступ к кнопкам, дисплею, подсветке и внешнему разъёму платы.',
         entries: [
             {
                 signature: 'import hackylens as hl',
@@ -32,6 +32,7 @@ export const sections: readonly DocSection[] = [
             },
         ],
         notes: [
+            'Подключите плату по USB и выберите её порт. Maix Cube может показывать два одинаковых порта. Если один не отвечает, попробуйте другой.',
             'Скрипт выполняется на ядре K210 core 1, интерфейс устройства остаётся отзывчивым.',
             'Стандартный лимит выполнения — 30 секунд, максимальный запрашиваемый лимит — 300 секунд.',
             'Нажатие BACK или команда «Стоп» прерывают программу через KeyboardInterrupt.',
@@ -57,6 +58,7 @@ hl.rgb(0, 64, 0)`,
         ],
         notes: [
             'BUTTON_LEFT = 1, BUTTON_OK = 2, BUTTON_RIGHT = 4, BUTTON_BACK = 8.',
+            'На Maix Cube кнопка POW служит кнопкой BACK.',
             'Во время sleep_ms() запрос остановки и дедлайн проверяются не реже одного раза в 5 мс.',
         ],
         example: `while not hl.button(hl.BUTTON_BACK):
@@ -69,7 +71,7 @@ hl.rgb(0, 64, 0)`,
     {
         id: 'display',
         label: 'Дисплей',
-        kicker: '320 × 240 / RGB565',
+        kicker: 'RGB565',
         title: 'Дисплей',
         lead: 'Команды формируют ограниченный кадр в памяти. Изменения появляются на панели после display_present().',
         entries: [
@@ -79,6 +81,7 @@ hl.rgb(0, 64, 0)`,
             { signature: 'hl.display_present()', description: 'Атомарно показывает подготовленный кадр.' },
         ],
         notes: [
+            'Разрешение дисплея: 320 × 240 на SEN0305 и 240 × 240 на Maix Cube.',
             'Цвета задаются значениями RGB565 от 0x0000 до 0xffff.',
             'Графика обрезается по правой и нижней границе экрана.',
             'После завершения скрипта прошивка удаляет Python-overlay и восстанавливает свой экран.',
@@ -107,15 +110,16 @@ hl.rgb(0, 0, 0)`,
     {
         id: 'uart',
         label: 'Внешний UART',
-        kicker: 'IO34 / IO35',
+        kicker: 'Внешний разъём',
         title: 'Внешний UART',
-        lead: 'UART использует внешний разъём HUSKYLENS. При первом вызове скрипт временно забирает разъём у штатного external-link сервиса.',
+        lead: 'UART использует внешний разъём платы. При первом вызове скрипт временно получает управление разъёмом у штатного сервиса.',
         entries: [
             { signature: 'hl.uart_init(baud=115200)', description: 'Настраивает UART со скоростью от 1200 до 2000000 бод.' },
             { signature: 'hl.uart_write(data)', description: 'Передаёт str или bytes и возвращает число отправленных байт.' },
             { signature: 'hl.uart_read(size=64)', description: 'Неблокирующе читает до 256 доступных байт.' },
         ],
         notes: [
+            'SEN0305 использует IO34 (RX) и IO35 (TX). Maix Cube использует IO24 (RX) и IO25 (TX) на Grove.',
             'Большая запись автоматически разбивается на сервисные блоки по 256 байт.',
             'Если данных нет, uart_read() возвращает b"".',
         ],
@@ -135,6 +139,7 @@ print(reply)`,
             { signature: 'hl.i2c_read(address, size, prefix=b"")', description: 'При необходимости пишет prefix, затем читает до 256 байт.' },
         ],
         notes: [
+            'SEN0305 использует IO34 (SCL) и IO35 (SDA). Maix Cube использует IO24 (SCL) и IO25 (SDA) на Grove.',
             'Аппаратный дедлайн одной транзакции — 100 мс.',
             'NACK или ошибка шины вызывают OSError, превышение сервисного дедлайна — RuntimeError.',
         ],

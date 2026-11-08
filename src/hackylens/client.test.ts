@@ -10,6 +10,7 @@ import {
     RuntimeState,
     packName,
 } from './client';
+import { boardProfile } from './boards';
 import {
     Frame,
     FrameFlag,
@@ -59,6 +60,7 @@ class FakeDevice implements ByteTransport {
     public constructor(
         private readonly formatDelayMs = 0,
         private readonly readyDelayMs: number | null = 0,
+        private readonly board = 'K210',
     ) {}
 
     private push(value: Uint8Array): void {
@@ -98,7 +100,7 @@ class FakeDevice implements ByteTransport {
         view.setUint32(16, 256 * 1024, true);
         view.setUint32(20, 1024 * 1024, true);
         view.setUint32(24, Array.from(this.files.values()).reduce((sum, file) => sum + file.length, 0), true);
-        this.response(request, concatBytes(fixed, packName('0.2.0'), packName('K210')));
+        this.response(request, concatBytes(fixed, packName('0.5.0'), packName(this.board)));
     }
 
     private handle(request: Frame): void {
@@ -285,13 +287,17 @@ class StalledHandshakeTransport implements ByteTransport {
 }
 
 describe('HMPY browser client', () => {
-    test('completes the storage and runtime workflow', async () => {
+    test.each([
+        ['huskylens-sen0305', 320],
+        ['sipeed-maix-cube', 240],
+    ])('completes the storage and runtime workflow on %s', async (board, width) => {
         const events: HmpyEvent[] = [];
-        const client = new HmpyClient(new FakeDevice(), { onEvent: (event) => events.push(event) });
+        const client = new HmpyClient(new FakeDevice(0, 0, board), { onEvent: (event) => events.push(event) });
         await client.open();
         const hello = await client.hello();
         expect(hello.sourceMax).toBe(65535);
-        expect(hello.board).toBe('K210');
+        expect(hello.board).toBe(board);
+        expect(boardProfile(hello.board)).toMatchObject({ width, height: 240 });
         expect(hello.bootFlags).toBe(BootFlag.WDT1_RECOVERY);
         expect(hello.capabilities & CAP_BOOT_FLAGS).toBe(CAP_BOOT_FLAGS);
 

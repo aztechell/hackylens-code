@@ -5,6 +5,11 @@ provides a Monaco editor, Web Serial transport, atomic script upload and file
 management, startup selection, run/stop/status controls, and live stdout/stderr
 over HMPY v1.
 
+The IDE supports HUSKYLENS SEN0305 and Sipeed Maix Cube with HackyLens
+firmware. Connect via USB and select the board's serial port. The IDE identifies
+the board from its HMPY reply and displays its screen size. Maix Cube can expose
+two USB serial ports with the same name. If one times out, select the other.
+
 This repository contains the complete buildable source tree. It is derived from
 [Pybricks Code](https://github.com/pybricks/pybricks-code) at the pinned revision
 recorded in [`HACKYLENS_UPSTREAM.json`](HACKYLENS_UPSTREAM.json), with the

@@ -11,9 +11,11 @@ import {
     HelloInfo,
     HmpyClient,
     HmpyEvent,
+    HmpyTimeout,
     RuntimeState,
     RuntimeStatus,
 } from './client';
+import { boardProfile } from './boards';
 import { MessageType } from './protocol';
 import { WebSerialTransport } from './serial';
 import { HackyLensDocs } from './HackyLensDocs';
@@ -89,6 +91,7 @@ export const HackyLensApp: React.FC = () => {
     const selected = files.find((file) => file.name === fileName);
     const mounted = hello?.filesystemState === FileSystemState.MOUNTED;
     const runnable = hello ? sourceBytes <= hello.sourceMax : sourceBytes <= 65535;
+    const board = boardProfile(hello?.board);
 
     const appendLog = useCallback((text: string) => {
         setLogs((previous) => (previous + text).slice(-100_000));
@@ -175,24 +178,31 @@ export const HackyLensApp: React.FC = () => {
         });
         clientRef.current = nextClient;
         try {
-            await nextClient.open();
+            await nextClient.open().catch((openError: unknown) => {
+                if (openError instanceof HmpyTimeout) {
+                    throw new Error(`${openError.message} Проверьте, что установлена прошивка HackyLens. Если у Maix Cube два одинаковых USB-порта, попробуйте второй.`);
+                }
+                throw openError;
+            });
             const profile = await nextClient.hello();
-            setHello(profile);
-            setConnected(true);
-            appendLog(`\n[подключено] ${profile.board}, firmware ${profile.firmwareVersion}, HMPY v${profile.protocolVersion}\n`);
-            if ((profile.capabilities & CAP_BOOT_FLAGS) &&
-                (profile.bootFlags & BootFlag.WDT1_RECOVERY)) {
-                appendLog('[восстановление] Перезапуск WDT1; автоматический запуск MicroPython отключён до следующей загрузки.\n');
-            }
             if (profile.filesystemState === FileSystemState.MOUNTED) {
                 await refreshFiles(nextClient);
             } else {
                 setFiles([]);
                 appendLog(`[userfs] ${filesystemNames[profile.filesystemState] ?? profile.filesystemState}\n`);
             }
-            setRuntime(await nextClient.status());
+            const status = await nextClient.status();
+            setHello(profile);
+            setRuntime(status);
+            setConnected(true);
+            appendLog(`\n[подключено] ${boardProfile(profile.board)?.name ?? profile.board}, firmware ${profile.firmwareVersion}, HMPY v${profile.protocolVersion}\n`);
+            if ((profile.capabilities & CAP_BOOT_FLAGS) &&
+                (profile.bootFlags & BootFlag.WDT1_RECOVERY)) {
+                appendLog('[восстановление] Перезапуск WDT1; автоматический запуск MicroPython отключён до следующей загрузки.\n');
+            }
         } catch (connectError) {
             clientRef.current = undefined;
+            setFiles([]);
             await nextClient.close().catch(() => undefined);
             throw connectError;
         }
@@ -405,7 +415,7 @@ export const HackyLensApp: React.FC = () => {
                         ▤ Документация
                     </button>
                     <span className={`connection-dot ${connected ? 'online' : ''}`} />
-                    <span className="connection-status">{connected ? `${hello?.board ?? 'HackyLens'} · ${hello?.firmwareVersion ?? ''}` : 'не подключено'}</span>
+                    <span className="connection-status">{hello ? `${board?.name ?? hello.board} · ${hello.firmwareVersion}` : 'не подключено'}</span>
                     <button className={connected ? 'button ghost' : 'button primary'} onClick={connected ? disconnect : connect} disabled={Boolean(busy)}>
                         {connected ? 'Отключить' : 'Подключить USB'}
                     </button>
@@ -467,6 +477,7 @@ export const HackyLensApp: React.FC = () => {
                             <span className={`runtime-pill state-${runtimeState}`}>{runtimeNames[runtimeState] ?? runtimeState}</span>
                         </div>
                         <dl className="facts">
+                            {board && <div><dt>Дисплей</dt><dd>{board.width} × {board.height}</dd></div>}
                             <div><dt>Run ID</dt><dd>{runtime?.runId ?? '—'}</dd></div>
                             <div><dt>Исходник</dt><dd>{runtime ? humanBytes(runtime.sourceBytes) : '—'}</dd></div>
                             <div><dt>Вывод в очереди</dt><dd>{runtime?.outputPending ?? '—'}</dd></div>

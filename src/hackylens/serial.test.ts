@@ -89,6 +89,18 @@ afterEach(() => {
 });
 
 describe('WebSerialTransport', () => {
+    test('shows how to retry if the browser USB chooser closes without selecting a port', async () => {
+        const requestPort = async () => {
+            throw new DOMException('No port selected by the user.', 'NotFoundError');
+        };
+        Object.defineProperty(globalThis, 'navigator', {
+            configurable: true,
+            value: { serial: { requestPort } },
+        });
+
+        await expect(WebSerialTransport.request()).rejects.toThrow('USB-порт не выбран');
+    });
+
     test('deasserts DTR and RTS after open and before acquiring streams', async () => {
         const events: string[] = [];
         const { port, open, setSignals } = makePort(events, true);

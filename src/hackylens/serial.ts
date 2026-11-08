@@ -41,7 +41,12 @@ export class WebSerialTransport implements ByteTransport {
     }
 
     public static async request(baudRate = 115200): Promise<WebSerialTransport> {
-        const port = await serialApi().requestPort();
+        const port = await serialApi().requestPort().catch((error: unknown) => {
+            if (error instanceof DOMException && error.name === 'NotFoundError') {
+                throw new Error('USB-порт не выбран. Нажмите «Подключить USB» и выберите порт платы.');
+            }
+            throw error;
+        });
         let opened = false;
         try {
             await port.open({ baudRate, bufferSize: 4096 });
