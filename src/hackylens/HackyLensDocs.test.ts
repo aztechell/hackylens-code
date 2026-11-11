@@ -5,7 +5,7 @@ import { filterDocSections, sections } from './HackyLensDocs';
 describe('HackyLens documentation', () => {
     it('contains the complete v1 navigation', () => {
         expect(sections.map((section) => section.id)).toEqual([
-            'start', 'buttons', 'display', 'lights', 'uart', 'i2c', 'cleanup',
+            'start', 'buttons', 'display', 'lights', 'uart', 'i2c', 'vision', 'cleanup',
         ]);
     });
 

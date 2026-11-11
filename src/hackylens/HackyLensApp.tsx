@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
     BootFlag,
     CAP_BOOT_FLAGS,
+    CAP_CAMERA,
     FILE_MAX,
     FORMAT_TOKEN,
     FileInfo,
@@ -16,6 +17,7 @@ import {
     RuntimeStatus,
 } from './client';
 import { boardProfile } from './boards';
+import { CameraPanel } from './CameraPanel';
 import { MessageType } from './protocol';
 import { WebSerialTransport } from './serial';
 import { HackyLensDocs } from './HackyLensDocs';
@@ -85,6 +87,7 @@ export const HackyLensApp: React.FC = () => {
     const [busy, setBusy] = useState('');
     const [error, setError] = useState('');
     const [docsOpen, setDocsOpen] = useState(false);
+    const [cameraOpen, setCameraOpen] = useState(false);
 
     const sourceBytes = useMemo(() => new TextEncoder().encode(source).length, [source]);
     const dirty = source !== savedSource;
@@ -407,6 +410,17 @@ export const HackyLensApp: React.FC = () => {
                 </div>
                 <div className="connection-cluster">
                     <button
+                        className={`button docs-toggle ${cameraOpen && !docsOpen ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => {
+                            setCameraOpen(!cameraOpen || docsOpen);
+                            setDocsOpen(false);
+                        }}
+                        aria-expanded={cameraOpen && !docsOpen}
+                    >
+                        Камера
+                    </button>
+                    <button
                         className={`button docs-toggle ${docsOpen ? 'active' : ''}`}
                         type="button"
                         onClick={() => setDocsOpen((open) => !open)}
@@ -471,6 +485,11 @@ export const HackyLensApp: React.FC = () => {
                 </section>
 
                 {!docsOpen && <aside className="right-column">
+                    {cameraOpen && <CameraPanel
+                        client={connected ? clientRef.current : undefined}
+                        supported={Boolean(hello && (hello.capabilities & CAP_CAMERA))}
+                        busy={Boolean(busy)}
+                    />}
                     <section className="runtime-card panel">
                         <div className="panel-heading compact">
                             <div><span className="eyebrow">CORE 1</span><h2>Runtime</h2></div>

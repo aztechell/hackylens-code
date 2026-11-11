@@ -149,6 +149,29 @@ value = hl.i2c_read(address, 2, b"\\x02")
 print(value)`,
     },
     {
+        id: 'vision',
+        label: 'Результаты распознавания',
+        kicker: 'C / MicroPython',
+        title: 'Результаты распознавания',
+        lead: 'Python читает последний результат активного FACE DETECT, QR-CAMERA, APRILTAG, OBJECT DETECT или FACE RECOG из того же сервиса, что и C.',
+        entries: [
+            { signature: 'hl.vision_results()', description: 'Возвращает словарь с frame_id, source, width, height, items и qr_payload.' },
+            { signature: 'hl.VISION_NONE, hl.VISION_FACE, hl.VISION_QR, hl.VISION_APRILTAG, hl.VISION_OBJECT_DETECT', description: 'Значения source. VISION_USER зарезервирован для пользовательских алгоритмов.' },
+            { signature: 'hl.VISION_FACE_RECOGNITION', description: 'Источник FACE RECOG. ID 1–10 соответствует сохранённому лицу, ID 0 означает UNKNOWN.' },
+            { signature: 'hl.VISION_BLOCK / hl.VISION_ARROW', description: 'Вид результата. Пары координат задают углы блока или концы стрелки в исходном кадре.' },
+        ],
+        notes: [
+            'Каждый элемент items — кортеж (kind, flags, id, x0, y0, x1, y1, confidence).',
+            'QR возвращает один блок и до 383 байт в qr_payload. Остальные источники возвращают пустые байты.',
+            'Оставьте приложение распознавания открытым на плате. Для QR и APRILTAG запускайте короткий скрипт после появления результата, чтобы освободить общее ядро для следующего сканирования.',
+        ],
+        example: `result = hl.vision_results()
+for kind, flags, item_id, x0, y0, x1, y1, confidence in result["items"]:
+    print(item_id, x0, y0, x1, y1)
+if result["source"] == hl.VISION_QR and result["items"]:
+    print(result["qr_payload"])`,
+    },
+    {
         id: 'cleanup',
         label: 'Стоп и cleanup',
         kicker: 'Runtime contract',
@@ -161,7 +184,7 @@ print(value)`,
         notes: [
             'Все аппаратные вызовы имеют ограниченное время выполнения.',
             'Если core 1 не остановился штатно, прошивка использует WDT1 как аварийный механизм восстановления.',
-            'Camera, KPU, SD/files и vision-result не входят в API v1.',
+            'Прямой доступ к камере, KPU и файлам SD остаётся за пределами API v1.',
         ],
         example: `try:
     while True:

@@ -21,6 +21,7 @@ export const RUN_TIME_MAX_MS = 300_000;
 export const FORMAT_TOKEN = 'ERASE USERFS';
 export const CAPABILITIES_V1_REQUIRED = 0xff;
 export const CAP_BOOT_FLAGS = 1 << 8;
+export const CAP_CAMERA = 1 << 9;
 
 const HANDSHAKE_TIMEOUT_MS = 8000;
 const HANDSHAKE_RETRY_MS = 350;
@@ -94,6 +95,12 @@ export interface FileInfo {
     readonly name: string;
     readonly size: number;
     readonly startup: boolean;
+}
+
+export interface CameraFrame {
+    readonly width: number;
+    readonly height: number;
+    readonly pixels: Uint8ClampedArray;
 }
 
 export interface RuntimeStatus {
@@ -630,6 +637,51 @@ export class HmpyClient {
             throw new HmpyClientError('Устройство вернуло усечённый файл.');
         }
         return output;
+    }
+
+    public async cameraFrame(snapshot = false): Promise<CameraFrame> {
+        const frames = await this.request(MessageType.CAMERA, Uint8Array.of(Number(snapshot)), 10_000);
+        const nativeWidth = snapshot ? 160 : 96;
+        const nativeHeight = snapshot ? 120 : 72;
+        const bytes = new Uint8Array(nativeWidth * nativeHeight * (snapshot ? 2 : 1));
+        let width = 0;
+        let height = 0;
+        let offset = 0;
+        for (const { payload } of frames) {
+            if (payload.length <= 8) {
+                throw new HmpyClientError('Короткий пакет камеры.');
+            }
+            const view = viewOf(payload);
+            const w = view.getUint16(0, true);
+            const h = view.getUint16(2, true);
+            const data = payload.subarray(8);
+            if (!((w === nativeWidth && h === nativeHeight) || (w === nativeHeight && h === nativeWidth)) ||
+                (offset !== 0 && (w !== width || h !== height)) ||
+                view.getUint32(4, true) !== offset || offset + data.length > bytes.length) {
+                throw new HmpyClientError('Неверный размер или смещение пакета камеры.');
+            }
+            width = w;
+            height = h;
+            bytes.set(data, offset);
+            offset += data.length;
+        }
+        if (offset !== bytes.length) {
+            throw new HmpyClientError('Кадр камеры получен не полностью.');
+        }
+        const pixels = new Uint8ClampedArray(width * height * 4);
+        const raw = viewOf(bytes);
+        for (let i = 0; i < width * height; i++) {
+            const pixel = snapshot ? raw.getUint16(i * 2, true) : bytes[i];
+            pixels[i * 4] = snapshot ? ((pixel >> 11) & 31) * 255 / 31 : (pixel >> 5) * 255 / 7;
+            pixels[i * 4 + 1] = snapshot ? ((pixel >> 5) & 63) * 255 / 63 : ((pixel >> 2) & 7) * 255 / 7;
+            pixels[i * 4 + 2] = snapshot ? (pixel & 31) * 255 / 31 : (pixel & 3) * 85;
+            pixels[i * 4 + 3] = 255;
+        }
+        return { width, height, pixels };
+    }
+
+    public async stopCamera(): Promise<void> {
+        await this.request(MessageType.CAMERA, Uint8Array.of(2));
     }
 
     public async upload(name: string, data: Uint8Array): Promise<void> {

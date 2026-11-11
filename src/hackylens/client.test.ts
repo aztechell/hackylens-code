@@ -3,6 +3,7 @@
 import {
     BootFlag,
     CAP_BOOT_FLAGS,
+    CAP_CAMERA,
     FileSystemState,
     HmpyClient,
     HmpyEvent,
@@ -56,6 +57,7 @@ class FakeDevice implements ByteTransport {
     public pingRequests = 0;
     public handshakeWrites = 0;
     public closeCalls = 0;
+    public badCameraOffset = false;
 
     public constructor(
         private readonly formatDelayMs = 0,
@@ -92,7 +94,7 @@ class FakeDevice implements ByteTransport {
         fixed[1] = FileSystemState.MOUNTED;
         fixed[2] = RuntimeState.STOPPED;
         fixed[3] = BootFlag.WDT1_RECOVERY;
-        view.setUint32(4, 0xff | CAP_BOOT_FLAGS, true);
+        view.setUint32(4, 0xff | CAP_BOOT_FLAGS | CAP_CAMERA, true);
         view.setUint16(8, 1024, true);
         view.setUint16(10, 1016, true);
         view.setUint16(12, 63, true);
@@ -215,6 +217,25 @@ class FakeDevice implements ByteTransport {
             case MessageType.SESSION_CLOSE:
                 this.response(request);
                 break;
+            case MessageType.CAMERA: {
+                const mode = request.payload[0];
+                if (mode === 2) {
+                    this.response(request);
+                    break;
+                }
+                const width = mode ? 120 : 72;
+                const height = mode ? 160 : 96;
+                const pixels = new Uint8Array(width * height * (mode + 1));
+                pixels.set(mode ? [0x00, 0xf8, 0xe0, 0x07, 0x1f, 0x00] : [0xe0, 0x1c, 0x03]);
+                for (let offset = 0; offset < pixels.length; offset += 383) {
+                    this.response(request, concatBytes(
+                        scalar(2, width), scalar(2, height),
+                        scalar(4, offset + (this.badCameraOffset && offset > 0 ? 1 : 0)),
+                        pixels.subarray(offset, offset + 383),
+                    ), offset + 383 < pixels.length);
+                }
+                break;
+            }
             default:
                 throw new Error(`unhandled fake request ${request.type}`);
         }
@@ -287,6 +308,28 @@ class StalledHandshakeTransport implements ByteTransport {
 }
 
 describe('HMPY browser client', () => {
+    test('assembles portrait preview and snapshot chunks and rejects discontinuities', async () => {
+        const device = new FakeDevice();
+        const client = new HmpyClient(device);
+        await client.open();
+        try {
+            expect((await client.hello()).capabilities & CAP_CAMERA).toBe(CAP_CAMERA);
+            for (const snapshot of [false, true]) {
+                const frame = await client.cameraFrame(snapshot);
+                expect(frame.width).toBe(snapshot ? 120 : 72);
+                expect(frame.height).toBe(snapshot ? 160 : 96);
+                expect(Array.from(frame.pixels.subarray(0, 12))).toEqual([
+                    255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255,
+                ]);
+            }
+            await client.stopCamera();
+            device.badCameraOffset = true;
+            await expect(client.cameraFrame()).rejects.toThrow('смещение');
+        } finally {
+            await client.close();
+        }
+    });
+
     test.each([
         ['huskylens-sen0305', 320],
         ['sipeed-maix-cube', 240],
