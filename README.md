@@ -20,7 +20,7 @@ provenance and attribution.
 
 ## Requirements
 
-- Node.js 20 or newer
+- Node.js 24, as used by CI
 - Chrome or Edge with Web Serial support
 - A secure browser context; `localhost` is accepted, deployed builds require
   HTTPS
