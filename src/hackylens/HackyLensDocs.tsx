@@ -149,6 +149,47 @@ value = hl.i2c_read(address, 2, b"\\x02")
 print(value)`,
     },
     {
+        id: 'camera',
+        label: 'Камера и цвет',
+        kicker: 'SEN0305 / Maix Cube',
+        title: 'Камера и трекер цвета',
+        lead: 'Кадр остаётся в буфере камеры. Скрипт получает его номер и размеры, ищет цветовую область и выводит кадр с рамкой на экран платы.',
+        entries: [
+            { signature: 'hl.camera_open() / hl.camera_close()', description: 'Открывает камеру для скрипта и освобождает её после работы.' },
+            { signature: 'hl.camera_frame()', description: 'Возвращает (lease, width, height, sequence) или None, пока кадр не готов.' },
+            { signature: 'hl.camera_find_color(lease, threshold, roi, min_pixels)', description: 'Возвращает (x, y, width, height, pixels) для самой крупной связной области или None. ROI можно задать прямоугольником или передать None для всего кадра.' },
+            { signature: 'hl.camera_present(lease, box)', description: 'Показывает кадр на экране платы. Передайте (x, y, width, height) для рамки или None.' },
+            { signature: 'hl.camera_release(lease)', description: 'Возвращает буфер камере. Освободите кадр перед запросом следующего.' },
+            { signature: 'hl.camera_model_open(source, package)', description: 'Загружает FACE DETECT или OBJECT DETECT с microSD. Укажите hl.VISION_FACE или hl.VISION_OBJECT_DETECT. Имя пакета можно опустить для штатной модели.' },
+            { signature: 'hl.camera_detect(lease)', description: 'Запускает детектор на выбранном кадре и возвращает словарь с координатами в ориентации экрана.' },
+            { signature: 'hl.camera_scan(lease, source)', description: 'Декодирует hl.VISION_QR или hl.VISION_APRILTAG на выбранном кадре. Возвращает рамки, содержимое QR в qr_payload или номера меток в items.' },
+            { signature: 'hl.camera_save(lease, name)', description: 'Сохраняет кадр как BMP в /PYDATA на microSD. Передайте имя 8.3, например FRAME.BMP.' },
+            { signature: 'hl.sd_write(name, data)', description: 'Создаёт новый файл в /PYDATA из bytes или bytearray и возвращает число записанных байтов. Имя должно быть в формате 8.3.' },
+            { signature: 'hl.camera_model_close()', description: 'Освобождает KPU и модель. Закрытие камеры также освобождает модель.' },
+        ],
+        notes: [
+            'На плате откройте главное меню или MICRO-PYTHON. В IDE откройте «Камера», сделайте снимок и выделите участок нужного цвета. Скопируйте порог из шести чисел в скрипт.',
+            'Координаты идут от левого верхнего угла кадра после поворота под экран платы.',
+        ],
+        example: `threshold = (20, 31, 0, 18, 0, 10)
+hl.camera_open()
+try:
+    while not hl.button(hl.BUTTON_BACK):
+        frame = hl.camera_frame()
+        if frame is None:
+            hl.sleep_ms(5)
+            continue
+        lease = frame[0]
+        try:
+            blob = hl.camera_find_color(lease, threshold, None, 24)
+            box = (blob[0], blob[1], blob[2], blob[3]) if blob else None
+            hl.camera_present(lease, box)
+        finally:
+            hl.camera_release(lease)
+finally:
+    hl.camera_close()`,
+    },
+    {
         id: 'vision',
         label: 'Результаты распознавания',
         kicker: 'C / MicroPython',
@@ -179,12 +220,12 @@ if result["source"] == hl.VISION_QR and result["items"]:
         lead: 'Остановка доставляется как KeyboardInterrupt. Запрос остаётся активным, даже если программа кратковременно перехватила исключение.',
         entries: [
             { signature: 'KeyboardInterrupt', description: 'Возникает при BACK, команде «Стоп» или достижении дедлайна.' },
-            { signature: 'automatic cleanup', description: 'Освобождает дисплей, свет и внешний разъём после normal, stop, timeout или exception.' },
+            { signature: 'automatic cleanup', description: 'Освобождает камеру, дисплей, свет и внешний разъём при завершении, остановке, дедлайне или ошибке.' },
         ],
         notes: [
             'Все аппаратные вызовы имеют ограниченное время выполнения.',
             'Если core 1 не остановился штатно, прошивка использует WDT1 как аварийный механизм восстановления.',
-            'Прямой доступ к камере, KPU и файлам SD остаётся за пределами API v1.',
+            'Пиксели кадра, KPU и файлы SD пока недоступны напрямую из Python.',
         ],
         example: `try:
     while True:

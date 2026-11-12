@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useEffect, useRef, useState } from 'react';
+import { cameraPoint, cameraRegion, rgb565Threshold } from './cameraColor';
+import type { CameraRegion } from './cameraColor';
 import { ErrorCode, HmpyRemoteError } from './client';
 import type { CameraFrame, HmpyClient } from './client';
 
@@ -11,6 +13,12 @@ interface Props {
 }
 
 type Mode = 'live' | 'snapshot';
+
+function drawFrame(context: CanvasRenderingContext2D, frame: CameraFrame): void {
+    const image = context.createImageData(frame.width, frame.height);
+    image.data.set(frame.pixels);
+    context.putImageData(image, 0, 0);
+}
 
 function releaseCamera(client: HmpyClient): void {
     if (client.isOpen) {
@@ -23,8 +31,13 @@ export const CameraPanel: React.FC<Props> = ({ client, supported, busy }) => {
     const [frame, setFrame] = useState<CameraFrame>();
     const [error, setError] = useState('');
     const [visible, setVisible] = useState(!document.hidden);
+    const [selection, setSelection] = useState<{ frame: CameraFrame; region: CameraRegion }>();
+    const [threshold, setThreshold] = useState('');
+    const [copyStatus, setCopyStatus] = useState('');
     const canvas = useRef<HTMLCanvasElement>(null);
+    const drag = useRef<{ id: number; x: number; y: number; frame: CameraFrame }>();
     const requested = useRef(false);
+    const shownFrame = selection?.frame ?? frame;
 
     useEffect(() => {
         const change = () => setVisible(!document.hidden);
@@ -36,6 +49,10 @@ export const CameraPanel: React.FC<Props> = ({ client, supported, busy }) => {
         setMode(undefined);
         setFrame(undefined);
         setError('');
+        setSelection(undefined);
+        setThreshold('');
+        setCopyStatus('');
+        drag.current = undefined;
         return () => {
             if (client && requested.current) {
                 releaseCamera(client);
@@ -102,15 +119,22 @@ export const CameraPanel: React.FC<Props> = ({ client, supported, busy }) => {
 
     useEffect(() => {
         const context = canvas.current?.getContext('2d');
-        if (frame && context) {
-            const image = context.createImageData(frame.width, frame.height);
-            image.data.set(frame.pixels);
-            context.putImageData(image, 0, 0);
+        if (shownFrame && context) {
+            drawFrame(context, shownFrame);
+            if (selection) {
+                const { x, y, width, height } = selection.region;
+                context.strokeStyle = '#fff';
+                context.strokeRect(x + 0.5, y + 0.5, width - 1, height - 1);
+            }
         }
-    }, [frame]);
+    }, [shownFrame, selection]);
 
     const start = (next: Mode) => {
         setError('');
+        setSelection(undefined);
+        setThreshold('');
+        setCopyStatus('');
+        drag.current = undefined;
         setMode(next);
     };
     const stop = () => {
@@ -121,7 +145,18 @@ export const CameraPanel: React.FC<Props> = ({ client, supported, busy }) => {
         }
     };
     const save = () => {
-        canvas.current?.toBlob((blob) => {
+        if (!shownFrame) {
+            return;
+        }
+        const image = document.createElement('canvas');
+        image.width = shownFrame.width;
+        image.height = shownFrame.height;
+        const context = image.getContext('2d');
+        if (!context) {
+            return;
+        }
+        drawFrame(context, shownFrame);
+        image.toBlob((blob) => {
             if (!blob) {
                 return;
             }
@@ -134,16 +169,64 @@ export const CameraPanel: React.FC<Props> = ({ client, supported, busy }) => {
         }, 'image/png');
     };
 
+    const startSelection = (event: React.PointerEvent<HTMLCanvasElement>) => {
+        if (!shownFrame || event.button !== 0) {
+            return;
+        }
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const point = cameraPoint(event.clientX - bounds.left, event.clientY - bounds.top, bounds, shownFrame);
+        if (!point) {
+            return;
+        }
+        event.currentTarget.setPointerCapture(event.pointerId);
+        drag.current = { id: event.pointerId, ...point, frame: shownFrame };
+        setSelection({ frame: shownFrame, region: cameraRegion(point, point) });
+        setThreshold('');
+        setCopyStatus('');
+        stop();
+    };
+    const moveSelection = (event: React.PointerEvent<HTMLCanvasElement>, finish: boolean) => {
+        const from = drag.current;
+        if (!from || from.id !== event.pointerId) {
+            return;
+        }
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const to = cameraPoint(event.clientX - bounds.left, event.clientY - bounds.top, bounds, from.frame, true);
+        if (to) {
+            const region = cameraRegion(from, to);
+            setSelection({ frame: from.frame, region });
+            if (finish) {
+                setThreshold(`(${rgb565Threshold(from.frame, region).join(', ')})`);
+            }
+        }
+        if (finish) {
+            drag.current = undefined;
+        }
+    };
+    const copyThreshold = async () => {
+        try {
+            await navigator.clipboard.writeText(threshold);
+            setCopyStatus('Порог скопирован');
+        } catch {
+            setCopyStatus('Выделите порог и скопируйте вручную');
+        }
+    };
+
     const available = Boolean(client && supported && !busy);
     return (
         <section className="camera-card panel" aria-label="Превью камеры">
             <div className="panel-heading compact">
                 <div><span className="eyebrow">HMPY</span><h2>Камера</h2></div>
-                {frame && <span className="camera-size">{frame.width} × {frame.height}</span>}
+                {shownFrame && <span className="camera-size">{shownFrame.width} × {shownFrame.height}</span>}
             </div>
             <div className="camera-image">
-                {frame
-                    ? <canvas ref={canvas} width={frame.width} height={frame.height} aria-label="Кадр с камеры" />
+                {shownFrame
+                    ? <canvas ref={canvas} width={shownFrame.width} height={shownFrame.height}
+                        aria-label="Кадр с камеры. Выделите область для подбора цвета."
+                        onPointerDown={startSelection}
+                        onPointerMove={(event) => moveSelection(event, false)}
+                        onPointerUp={(event) => moveSelection(event, true)}
+                        onLostPointerCapture={() => { drag.current = undefined; }} />
                     : <p className="empty-state">{!client ? 'Подключите плату по USB.' : !supported
                         ? 'Для превью нужна прошивка с поддержкой камеры в IDE.'
                         : mode ? 'Получаем кадр…' : 'Запустите превью или сделайте снимок.'}</p>}
@@ -154,8 +237,17 @@ export const CameraPanel: React.FC<Props> = ({ client, supported, busy }) => {
                     disabled={!mode && !available}>{mode ? 'Остановить' : '▶ Превью'}</button>
                 <button type="button" className="button ghost small" onClick={() => start('snapshot')}
                     disabled={!available || mode === 'snapshot'}>Снимок</button>
-                <button type="button" className="button ghost small" onClick={save} disabled={!frame}>Скачать PNG</button>
+                <button type="button" className="button ghost small" onClick={save} disabled={!shownFrame}>Скачать PNG</button>
             </div>
+            {shownFrame && <div className="camera-threshold">
+                {threshold
+                    ? <>
+                        <label>Порог RGB565<input readOnly value={threshold} onFocus={(event) => event.target.select()} /></label>
+                        <button type="button" className="button ghost small" onClick={copyThreshold}>Копировать порог</button>
+                        {copyStatus && <span role="status">{copyStatus}</span>}
+                    </>
+                    : <span>Выделите на кадре участок нужного цвета.</span>}
+            </div>}
         </section>
     );
 };

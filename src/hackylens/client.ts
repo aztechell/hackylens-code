@@ -101,6 +101,7 @@ export interface CameraFrame {
     readonly width: number;
     readonly height: number;
     readonly pixels: Uint8ClampedArray;
+    readonly format: 'rgb332' | 'rgb565';
 }
 
 export interface RuntimeStatus {
@@ -677,7 +678,7 @@ export class HmpyClient {
             pixels[i * 4 + 2] = snapshot ? (pixel & 31) * 255 / 31 : (pixel & 3) * 85;
             pixels[i * 4 + 3] = 255;
         }
-        return { width, height, pixels };
+        return { width, height, pixels, format: snapshot ? 'rgb565' : 'rgb332' };
     }
 
     public async stopCamera(): Promise<void> {

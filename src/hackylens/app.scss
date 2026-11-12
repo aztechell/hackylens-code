@@ -604,6 +604,8 @@ input:focus-visible {
     max-height: 226px;
     object-fit: contain;
     image-rendering: pixelated;
+    cursor: crosshair;
+    touch-action: none;
 }
 
 .camera-size {
@@ -622,6 +624,33 @@ input:focus-visible {
     flex-wrap: wrap;
     gap: 5px;
     padding: 8px 10px 10px;
+}
+
+.camera-threshold {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 6px;
+    padding: 0 10px 10px;
+    color: var(--muted);
+    font-size: 11px;
+
+    label {
+        display: grid;
+        flex: 1;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    input {
+        width: 100%;
+        min-width: 0;
+        padding: 5px;
+        border: 1px solid var(--line);
+        background: #0a130e;
+        color: var(--text);
+        font: 11px var(--mono);
+    }
 }
 
 .runtime-pill {
